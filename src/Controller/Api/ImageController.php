@@ -4,6 +4,7 @@ namespace App\Controller\Api;
 
 use App\Entity\Image;
 use App\Form\ImageType;
+use App\Services\RequestDataRemapper;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -14,10 +15,11 @@ use Symfony\Component\Serializer\SerializerInterface;
 class ImageController extends AbstractController
 {
     #[Route('/api/images/upload', name: 'api_images_upload', methods: ['POST'])]
-    public function upload(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
+    public function upload(RequestDataRemapper $requestDataRemapper, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
     {
         $image = new Image();
         $form = $this->createForm(ImageType::class, $image);
+        $request = $requestDataRemapper->remapRequestData('image');
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
