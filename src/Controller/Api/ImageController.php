@@ -9,8 +9,11 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Serializer\SerializerInterface;
+use Vich\UploaderBundle\Handler\DownloadHandler;
 
 class ImageController extends AbstractController
 {
@@ -29,7 +32,7 @@ class ImageController extends AbstractController
             return new JsonResponse([
                 'id' => $image->getId(),
                 'idFromFront' => $image->getIdFromFront(),
-                'url' => $this->generateUrl('api_images_get', ['id' => $image->getId()])
+                'url' => $this->generateUrl('api_images_get', ['id' => $image->getId()], UrlGeneratorInterface::ABSOLUTE_URL)
             ], JsonResponse::HTTP_CREATED);
         }
 
@@ -39,9 +42,8 @@ class ImageController extends AbstractController
     }
 
     #[Route('/api/images/{id}', name: 'api_images_get', methods: ['GET'])]
-    public function getImage(Image $image): JsonResponse
+    public function getImage(Image $image, DownloadHandler $downloadHandler): StreamedResponse
     {
-        $url = $this->generateUrl('api_images_get', ['id' => $image->getId()]);
-        return new JsonResponse(['url' => $url]);
+        return $downloadHandler->downloadObject($image, 'file');
     }
 }
