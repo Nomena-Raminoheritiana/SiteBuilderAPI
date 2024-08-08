@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Request;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;

@@ -4,11 +4,10 @@ namespace App\Controller\Api;
 
 use App\Entity\Image;
 use App\Form\ImageType;
-use App\Services\RequestDataRemapper;
+use App\Services\Request\RequestDataRemapper;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
