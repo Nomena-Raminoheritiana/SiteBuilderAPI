@@ -34,7 +34,7 @@ class JWTService
         $now = new \DateTimeImmutable();
         return $this->config->builder()
             ->issuedAt($now)
-            ->expiresAt($now->modify('+1 hour'))
+            ->expiresAt($now->modify('+2 hour'))
             ->withClaim('uid', $claim)
             ->getToken($this->config->signer(), $this->config->signingKey());
     }
