@@ -28,15 +28,15 @@ class LoginAuthenticator extends AbstractAuthenticator
     public function supports(Request $request): ?bool
     {
         return (
-            $request->request->has('username') ||
-            $request->request->has('password')
+            $request->getPayload()->has('username') ||
+            $request->getPayload()->has('password')
         );
     }
 
     public function authenticate(Request $request): Passport
     {
-        $username = $request->request->get('username');
-        $password = $request->request->get('password');
+        $username = $request->getPayload()->get('username');
+        $password = $request->getPayload()->get('password');
         return new Passport(
             new UserBadge($username),
             new PasswordCredentials($password)
@@ -56,7 +56,7 @@ class LoginAuthenticator extends AbstractAuthenticator
             ], Response::HTTP_OK);
         }
         return new JsonResponse([
-            "error" => "user not found"
+            "error" => "User not found"
         ], Response::HTTP_UNAUTHORIZED);
     }
 
