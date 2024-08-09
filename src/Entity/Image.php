@@ -6,6 +6,7 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\OpenApi\Model\Operation;
 use ApiPlatform\OpenApi\Model\RequestBody;
@@ -23,9 +24,13 @@ use Vich\UploaderBundle\Mapping\Annotation\UploadableField;
     operations: [
         new Get(),
         new Delete(
-            uriTemplate: "/images/{idFromFront}",
+            uriTemplate: "/images/{idFromFront}/{pageId}",
             uriVariables: [
-                'idFromFront' => 'idFromFront'
+                'idFromFront' => 'idFromFront',
+                'pageId' => new Link(
+                    fromProperty: "images",
+                    fromClass: Page::class
+                )
             ]
         ),
         new Post(
