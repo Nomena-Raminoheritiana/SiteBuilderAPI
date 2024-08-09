@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\OpenApi\Model\Operation;
@@ -21,6 +22,12 @@ use Vich\UploaderBundle\Mapping\Annotation\UploadableField;
     types: ['https://schema.org/Image'],
     operations: [
         new Get(),
+        new Delete(
+            uriTemplate: "/images/{idFromFront}",
+            uriVariables: [
+                'idFromFront' => 'idFromFront'
+            ]
+        ),
         new Post(
             types: ['https://schema.org/Image'],
             inputFormats: ['multipart' => ['multipart/form-data']],
