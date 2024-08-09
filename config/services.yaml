@@ -26,8 +26,3 @@ services:
     App\Services\Token\JWTService:
         arguments:
             $jwtDefaultSecretKey: '%jwt.default.secretKey%'
-    App\ApiResource\DataTransformer\PageTransformer:
-        arguments:
-            $entityManager: '@doctrine.orm.entity_manager'
-        tags:
-            - { name: 'api_platform.data_transformer' }
