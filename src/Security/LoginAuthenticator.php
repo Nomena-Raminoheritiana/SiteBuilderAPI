@@ -52,7 +52,7 @@ class LoginAuthenticator extends AbstractAuthenticator
             $this->entityManager->persist($user);
             $this->entityManager->flush();
             return new JsonResponse([
-                "token" => $userToken
+                "token" => $user->getToken()
             ], Response::HTTP_OK);
         }
         return new JsonResponse([
