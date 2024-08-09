@@ -19,13 +19,12 @@ class JWTService
     private Configuration $config;
 
     public function __construct(
-        $jwtDefaultSecretKey,
-        Security $security
+        $jwtDefaultSecretKey
     )
     {
         $this->config = Configuration::forSymmetricSigner(
             new Sha256(),
-            InMemory::plainText($security->getUser()?->getUserIdentifier() || $jwtDefaultSecretKey)
+            InMemory::plainText( $jwtDefaultSecretKey)
         );
     }
 
