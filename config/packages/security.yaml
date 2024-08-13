@@ -10,6 +10,13 @@ security:
                 class: App\Entity\User
                 property: email
     firewalls:
+        api:
+            pattern: ^/api
+            stateless: true
+            access_token:
+                token_handler: App\Security\AccessTokenHandler
+                token_extractors:
+                    - 'header'
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
@@ -18,9 +25,9 @@ security:
             provider: app_user_provider
             custom_authenticators:
                 - App\Security\LoginAuthenticator
-            access_token:
-                token_handler: App\Security\AccessTokenHandler
-                token_extractors: header
+#            access_token:
+#                token_handler: App\Security\AccessTokenHandler
+#                token_extractors: header
 
 
             # activate different ways to authenticate
