@@ -31,7 +31,8 @@ use Vich\UploaderBundle\Mapping\Annotation\UploadableField;
                     fromProperty: "images",
                     fromClass: Page::class
                 )
-            ]
+            ],
+            security: "is_granted('ROLE_ADMIN')"
         ),
         new Post(
             types: ['https://schema.org/Image'],
@@ -53,6 +54,7 @@ use Vich\UploaderBundle\Mapping\Annotation\UploadableField;
                     ])
                 )
             ),
+            security: "is_granted('ROLE_ADMIN')",
         )
     ],
     outputFormats: ['json' => ['application/json']],
