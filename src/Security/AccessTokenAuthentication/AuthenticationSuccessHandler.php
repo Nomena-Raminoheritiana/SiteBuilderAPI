@@ -15,8 +15,11 @@ class AuthenticationSuccessHandler implements \Symfony\Component\Security\Http\A
      */
     public function onAuthenticationSuccess(Request $request, TokenInterface $token): ?Response
     {
-        return new JsonResponse([
-                    'verified' => true
-                ]);
+        if(str_contains($request->getUri(), "/api/verifyToken")) {
+            return new JsonResponse([
+                'verified' => true
+            ]);
+        }
+       return null;
     }
 }
