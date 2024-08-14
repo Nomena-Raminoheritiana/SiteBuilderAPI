@@ -14,7 +14,9 @@ security:
             pattern: ^/api
             stateless: true
             access_token:
-                token_handler: App\Security\AccessTokenHandler
+                token_handler: App\Security\AccessTokenAuthentication\AccessTokenHandler
+                success_handler: App\Security\AccessTokenAuthentication\AuthenticationSuccessHandler
+                failure_handler: App\Security\AccessTokenAuthentication\AuthenticationFailureHandler
                 token_extractors:
                     - 'header'
         dev:
@@ -41,6 +43,7 @@ security:
     access_control:
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
+         - { path: ^/api/verifyToken, roles: ROLE_ADMIN }
 
 when@test:
     security:
