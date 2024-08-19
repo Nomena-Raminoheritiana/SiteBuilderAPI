@@ -29,7 +29,7 @@ use Vich\UploaderBundle\Mapping\Annotation\UploadableField;
                 'idFromFront' => 'idFromFront',
                 'pageId' => new Link(
                     fromProperty: "images",
-                    fromClass: Page::class
+                    fromClass: Model::class
                 )
             ],
             security: "is_granted('ROLE_ADMIN')"
@@ -83,7 +83,7 @@ class Image
     #[ORM\ManyToOne(inversedBy: 'images')]
     #[ApiProperty(readable: true)]
     #[Groups(['Image:read'])]
-    private ?Page $page = null;
+    private ?Model $model = null;
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updateAt = null;
@@ -137,14 +137,14 @@ class Image
         return $this;
     }
 
-    public function getPage(): ?Page
+    public function getModel(): ?Model
     {
-        return $this->page;
+        return $this->model;
     }
 
-    public function setPage(?Page $page): static
+    public function setModel(?Model $model): static
     {
-        $this->page = $page;
+        $this->model = $model;
 
         return $this;
     }

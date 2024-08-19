@@ -5,13 +5,13 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Patch;
-use App\Repository\PageRepository;
+use App\Repository\ModelRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-#[ORM\Entity(repositoryClass: PageRepository::class)]
+#[ORM\Entity(repositoryClass: ModelRepository::class)]
 #[ApiResource(
     operations: [
         new Get(),
@@ -23,7 +23,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
     normalizationContext: ['groups' => ['Page:read']],
     denormalizationContext: ['groups' => ['Page:write']]
 )]
-class Page
+class Model
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -107,7 +107,7 @@ class Page
     {
         if (!$this->images->contains($image)) {
             $this->images->add($image);
-            $image->setPage($this);
+            $image->setModel($this);
         }
 
         return $this;
@@ -117,8 +117,8 @@ class Page
     {
         if ($this->images->removeElement($image)) {
             // set the owning side to null (unless already changed)
-            if ($image->getPage() === $this) {
-                $image->setPage(null);
+            if ($image->getModel() === $this) {
+                $image->setModel(null);
             }
         }
 
