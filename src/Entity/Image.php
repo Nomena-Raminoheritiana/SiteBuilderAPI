@@ -24,10 +24,10 @@ use Vich\UploaderBundle\Mapping\Annotation\UploadableField;
     operations: [
         new Get(),
         new Delete(
-            uriTemplate: "/images/{idFromFront}/{pageId}",
+            uriTemplate: "/images/{idFromFront}/{modelId}",
             uriVariables: [
                 'idFromFront' => 'idFromFront',
-                'pageId' => new Link(
+                'modelId' => new Link(
                     fromProperty: "images",
                     fromClass: Model::class
                 )
