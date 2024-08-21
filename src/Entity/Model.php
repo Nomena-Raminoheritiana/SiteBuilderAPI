@@ -46,8 +46,12 @@ class Model
     /**
      * @var Collection<int, Image>
      */
-    #[ORM\OneToMany(targetEntity: Image::class, mappedBy: 'page')]
+    #[ORM\OneToMany(targetEntity: Image::class, mappedBy: 'model')]
     private Collection $images;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['Page:read','Page:write','Image:read'])]
+    private ?string $themeColor = 'default';
 
     public function __construct()
     {
@@ -121,6 +125,18 @@ class Model
                 $image->setModel(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getThemeColor(): ?string
+    {
+        return $this->themeColor;
+    }
+
+    public function setThemeColor(?string $themeColor): static
+    {
+        $this->themeColor = $themeColor;
 
         return $this;
     }
