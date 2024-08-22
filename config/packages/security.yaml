@@ -27,6 +27,8 @@ security:
             provider: app_user_provider
             custom_authenticators:
                 - App\Security\LoginAuthenticator
+            logout:
+                path: /logout
 #            access_token:
 #                token_handler: App\Security\AccessTokenHandler
 #                token_extractors: header
