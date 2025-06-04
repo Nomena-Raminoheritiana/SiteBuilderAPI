@@ -4,6 +4,7 @@ namespace App\Entity\Traits;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 trait UuidTrait
 {
@@ -13,10 +14,16 @@ trait UuidTrait
     protected ?int $id = null;
 
 
+    #[Groups(['User:read'])]
     #[ORM\Column(name: 'uuid', type: 'uuid', length: 36, unique: true)]
     protected Uuid $uuid;
 
     public function __construct()
+    {
+        $this->generateUuid();
+    }
+
+     public function initializeUuid(): void
     {
         $this->generateUuid();
     }

@@ -16,6 +16,7 @@ api_platform:
         jsonld: ['application/ld+json']
         multipart: ['multipart/form-data']
     defaults:
+        validation: true
         stateless: true
         cache_headers:
             vary: ['Content-Type', 'Authorization', 'Origin']

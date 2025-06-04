@@ -26,3 +26,7 @@ services:
     App\Services\Token\JWTService:
         arguments:
             $jwtDefaultSecretKey: '%jwt.default.secretKey%'
+            
+    ApiPlatform\State\ProcessorInterface $persistProcessor:
+        alias: 'api_platform.doctrine.orm.state.persist_processor'
+        public: false

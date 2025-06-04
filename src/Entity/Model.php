@@ -53,6 +53,10 @@ class Model
     #[Groups(['Page:read','Page:write','Image:read'])]
     private ?string $themeColor = 'default';
 
+    #[ORM\ManyToOne(inversedBy: 'modeles')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $user = null;
+
     public function __construct()
     {
         $this->images = new ArrayCollection();
@@ -137,6 +141,18 @@ class Model
     public function setThemeColor(?string $themeColor): static
     {
         $this->themeColor = $themeColor;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
 
         return $this;
     }
