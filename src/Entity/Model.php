@@ -7,8 +7,9 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
-use App\ApiResource\Controller\CreateModelController;
-use App\ApiResource\Controller\GetModelByUserUuidController;
+use App\ApiResource\Controller\Model\CreateModelController;
+use App\ApiResource\Controller\Model\GetModelByUserUuidController;
+use App\ApiResource\Controller\Model\GetModelsByUserUuidController;
 use App\Repository\ModelRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -18,12 +19,20 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ORM\Entity(repositoryClass: ModelRepository::class)]
 #[ApiResource(
     operations: [
-        new Get(),
+        new Get(
+            security: "is_granted('ROLE_ADMIN')",
+            read: false,
+            controller: GetModelByUserUuidController::class,
+            openapiContext: [
+                'summary' => 'Api to get a model for the current user connected',
+                'security' => [['bearerAuth' => []]],
+            ]
+        ),
         new GetCollection(
             uriTemplate: '/models',
             read: false,
             name: 'models_by_user',
-            controller: GetModelByUserUuidController::class,
+            controller: GetModelsByUserUuidController::class,
             security: "is_granted('ROLE_ADMIN')",
             openapiContext: [
                 'summary' => 'Api to get the list of the models of the user connected',

@@ -1,5 +1,5 @@
 <?php
-namespace App\ApiResource\Controller;
+namespace App\ApiResource\Controller\Model;
 
 use App\Entity\Model;
 use Doctrine\ORM\EntityManagerInterface;
