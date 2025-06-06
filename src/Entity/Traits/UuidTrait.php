@@ -13,8 +13,6 @@ trait UuidTrait
     #[ORM\Id]
     protected ?int $id = null;
 
-
-    #[Groups(['User:read'])]
     #[ORM\Column(name: 'uuid', type: 'uuid', length: 36, unique: true)]
     protected Uuid $uuid;
 
