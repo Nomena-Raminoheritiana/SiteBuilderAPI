@@ -4,7 +4,9 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
+use App\ApiResource\Controller\GetModelByUserUuidController;
 use App\Repository\ModelRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -15,6 +17,16 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ApiResource(
     operations: [
         new Get(),
+        new GetCollection(
+            uriTemplate: '/models/user/{uuid}',
+            uriVariables: [
+                'uuid' => 'uuid'
+            ],
+            read: false,
+            name: 'models_by_user',
+            controller: GetModelByUserUuidController::class,
+            security: "is_granted('ROLE_ADMIN')"
+        ),
         new Patch(
             security: "is_granted('ROLE_ADMIN')"
         )

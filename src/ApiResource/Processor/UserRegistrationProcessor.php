@@ -3,12 +3,11 @@
 namespace App\ApiResource\Processor;
 
 use ApiPlatform\Metadata\Operation;
-use ApiPlatform\Doctrine\Orm\State\PersistProcessor;
 use App\Entity\User;
 use App\Services\Token\JWTService;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
 use ApiPlatform\State\ProcessorInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 class UserRegistrationProcessor implements ProcessorInterface
 {
