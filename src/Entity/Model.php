@@ -6,6 +6,8 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use App\ApiResource\Controller\CreateModelController;
 use App\ApiResource\Controller\GetModelByUserUuidController;
 use App\Repository\ModelRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -25,7 +27,15 @@ use Symfony\Component\Serializer\Annotation\Groups;
             security: "is_granted('ROLE_ADMIN')",
             openapiContext: [
                 'summary' => 'Api to get the list of the models of the user connected',
-                'security' => [['bearerAuth' => ["7d1cb5f6-0928-4588-a526-2b54bd483d3c"]]],
+                'security' => [['bearerAuth' => []]],
+            ]
+        ),
+        new Post(
+            security: "is_granted('ROLE_ADMIN')",
+            controller: CreateModelController::class,
+            openapiContext: [
+                'summary' => 'Api to save model of the user connected',
+                'security' => [['bearerAuth' => []]],
             ]
         ),
         new Patch(
@@ -33,27 +43,27 @@ use Symfony\Component\Serializer\Annotation\Groups;
         )
     ],
     outputFormats: ['json' => ['application/json']],
-    normalizationContext: ['groups' => ['Page:read']],
-    denormalizationContext: ['groups' => ['Page:write']]
+    normalizationContext: ['groups' => ['Model:read']],
+    denormalizationContext: ['groups' => ['Model:write']]
 )]
 class Model
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['Page:read','Page:write','Image:read'])]
+    #[Groups(['Model:read','Model:write','Image:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['Page:read','Page:write','Image:read'])]
+    #[Groups(['Model:read','Model:write','Image:read'])]
     private ?string $name = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['Page:read','Page:write'])]
+    #[Groups(['Model:read','Model:write'])]
     private ?array $props = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['Page:read','Page:write'])]
+    #[Groups(['Model:read','Model:write'])]
     private ?string $slug = null;
 
     /**
@@ -63,7 +73,7 @@ class Model
     private Collection $images;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['Page:read','Page:write','Image:read'])]
+    #[Groups(['Model:read','Model:write','Image:read'])]
     private ?string $themeColor = 'default';
 
     #[ORM\ManyToOne(inversedBy: 'modeles')]
