@@ -4,22 +4,23 @@ namespace App\ApiResource\Controller;
 use App\Repository\ModelRepository;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Uid\Uuid;
 
 #[AsController]
 class GetModelByUserUuidController extends AbstractController {
 
     public function __invoke(
-        string $uuid,
+        Request $request,
         ModelRepository $modelRepository,
         UserRepository $userRepository
     ): array
     {
         try {
-            $user = $userRepository->findOneBy(['uuid'=> Uuid::fromString($uuid)]);
+            $authHeader = $request->headers->get('Authorization');
+            $user = $userRepository->findOneBy(['token'=> substr($authHeader, 7)]);
             if (!$user) {
                 throw new NotFoundHttpException('User not found.');
             }

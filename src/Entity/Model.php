@@ -18,14 +18,15 @@ use Symfony\Component\Serializer\Annotation\Groups;
     operations: [
         new Get(),
         new GetCollection(
-            uriTemplate: '/models/user/{uuid}',
-            uriVariables: [
-                'uuid' => 'uuid'
-            ],
+            uriTemplate: '/models',
             read: false,
             name: 'models_by_user',
             controller: GetModelByUserUuidController::class,
-            security: "is_granted('ROLE_ADMIN')"
+            security: "is_granted('ROLE_ADMIN')",
+            openapiContext: [
+                'summary' => 'Api to get the list of the models of the user connected',
+                'security' => [['bearerAuth' => ["7d1cb5f6-0928-4588-a526-2b54bd483d3c"]]],
+            ]
         ),
         new Patch(
             security: "is_granted('ROLE_ADMIN')"

@@ -30,3 +30,9 @@ services:
     ApiPlatform\State\ProcessorInterface $persistProcessor:
         alias: 'api_platform.doctrine.orm.state.persist_processor'
         public: false
+
+    App\ApiResource\OpenApi\OpenApiFactory:
+        decorates: 'api_platform.openapi.factory'
+        arguments: ['@App\ApiResource\OpenApi\OpenApiFactory.inner']
+        autoconfigure: false
+        autowire: true
