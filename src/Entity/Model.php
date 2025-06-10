@@ -20,9 +20,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ApiResource(
     operations: [
         new Get(
-            security: "is_granted('ROLE_ADMIN')",
+            // security: "is_granted('ROLE_ADMIN')",
             read: false,
-            controller: GetModelByUserUuidController::class,
+            // controller: GetModelByUserUuidController::class,
             openapiContext: [
                 'summary' => 'Api to get a model for the current user connected',
                 'security' => [['bearerAuth' => []]],
