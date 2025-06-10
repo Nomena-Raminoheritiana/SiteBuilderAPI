@@ -21,11 +21,11 @@ use Symfony\Component\Serializer\Annotation\Groups;
     operations: [
         new Get(
             // security: "is_granted('ROLE_ADMIN')",
-            read: false,
+            // read: false,
             // controller: GetModelByUserUuidController::class,
             openapiContext: [
                 'summary' => 'Api to get a model for the current user connected',
-                'security' => [['bearerAuth' => []]],
+                // 'security' => [['bearerAuth' => []]],
             ]
         ),
         new GetCollection(
