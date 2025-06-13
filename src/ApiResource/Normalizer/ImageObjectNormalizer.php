@@ -5,6 +5,7 @@ namespace App\ApiResource\Normalizer;
 use App\Entity\Image;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Vich\UploaderBundle\Storage\StorageInterface;
 
@@ -17,16 +18,18 @@ class ImageObjectNormalizer implements NormalizerInterface
         #[Autowire(service: 'api_platform.jsonld.normalizer.item')]
         private readonly NormalizerInterface $normalizer,
         private readonly StorageInterface $storage,
-        private readonly RequestStack $requestStack
+        private readonly RequestStack $requestStack,
+        private readonly RouterInterface $router
     ) {
     }
 
     public function normalize($object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         $context[self::ALREADY_CALLED] = true;
-        $host = $this->requestStack->getCurrentRequest()->getSchemeAndHttpHost();
-        $filePath = $this->storage->resolveUri($object, 'file');
-        $object->setUrl($host.$filePath);
+        $url = $this->router->generate('api_image_download', [
+            'id' => $object->getId(),
+        ], RouterInterface::ABSOLUTE_URL);
+        $object->setUrl($url);
 
         return $this->normalizer->normalize($object, $format, $context);
     }

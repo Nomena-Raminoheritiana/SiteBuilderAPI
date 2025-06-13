@@ -10,6 +10,7 @@ use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\OpenApi\Model\Operation;
 use ApiPlatform\OpenApi\Model\RequestBody;
+use App\ApiResource\Controller\Image\ImageDownloadController;
 use App\Repository\ImageRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File;
@@ -23,6 +24,19 @@ use Vich\UploaderBundle\Mapping\Annotation\UploadableField;
     types: ['https://schema.org/Image'],
     operations: [
         new Get(),
+        new Get(
+            name: "api_image_download",
+            uriTemplate: "/image-download/file/{id}",
+            uriVariables: [
+                'id' => new Link(
+                    fromClass: Image::class,
+                    identifiers: ['id']
+                )
+            ],
+            controller: ImageDownloadController::class,
+            read: true,
+            output: false
+        ),
         new Delete(
             uriTemplate: "/images/{idFromFront}/{modelId}",
             uriVariables: [
