@@ -16,6 +16,16 @@ class ModelRepository extends ServiceEntityRepository
         parent::__construct($registry, Model::class);
     }
 
+    public function findBySlugAndPropsNotNull(string $slug): Array
+    {
+        return $this->createQueryBuilder('m')
+            ->andWhere('m.slug = :slug')
+            ->andWhere('m.props IS NOT NULL')
+            ->setParameter('slug', $slug)
+            ->getQuery()
+            ->getResult();
+    }
+
     //    /**
     //     * @return Page[] Returns an array of Page objects
     //     */

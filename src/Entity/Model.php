@@ -5,11 +5,13 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\ApiResource\Controller\Model\CreateModelController;
-use App\ApiResource\Controller\Model\GetModelByUserUuidController;
 use App\ApiResource\Controller\Model\GetModelsByUserUuidController;
+use App\ApiResource\Controller\Model\SyncDataController;
+use App\ApiResource\Dto\Input\Model\ModelSyncInput;
 use App\Repository\ModelRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -39,11 +41,41 @@ use Symfony\Component\Serializer\Annotation\Groups;
                 'security' => [['bearerAuth' => []]],
             ]
         ),
+        new GetCollection(
+            uriTemplate: '/models/getBySlug/{slug}',
+            uriVariables: [
+                'slug'=>  new Link(
+                    fromClass: Model::class,
+                    identifiers: ['slug'],
+                    parameterName: 'slug'
+                )
+            ],
+            read: true,
+            name: 'models_by_slug',
+            security: "is_granted('ROLE_ADMIN')",
+            openapiContext: [
+                'summary' => 'Api to get the list of the models of the user connected',
+                'security' => [['bearerAuth' => []]],
+            ]
+        ),
         new Post(
             security: "is_granted('ROLE_ADMIN')",
             controller: CreateModelController::class,
             openapiContext: [
                 'summary' => 'Api to save model of the user connected',
+                'security' => [['bearerAuth' => []]],
+            ]
+        ),
+        new Post(
+            read: false,
+            write: false,
+            uriTemplate: '/models/syncData',
+            input: ModelSyncInput::class,
+            security: "is_granted('ROLE_ADMIN')",
+            controller: SyncDataController::class,
+            denormalizationContext: ['groups' => ['Model:sync-write']],
+            openapiContext: [
+                'summary' => 'Api to sync data',
                 'security' => [['bearerAuth' => []]],
             ]
         ),
