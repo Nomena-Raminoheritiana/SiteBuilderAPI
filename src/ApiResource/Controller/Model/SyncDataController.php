@@ -3,6 +3,7 @@ namespace App\ApiResource\Controller\Model;
 
 use App\ApiResource\Dto\Input\Model\ModelSyncInput;
 use App\Repository\ModelRepository;
+use App\Services\ArraySynchronizer;
 use App\Services\DumpSqlService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -17,39 +18,6 @@ class SyncDataController extends AbstractController {
         private DumpSqlService $dumpSqlService
     ) {}
 
-    private function syncJson(array $json1, array $json2): array {
-        $result = [];
-        foreach ($json1 as $key => $value) {
-            if (array_key_exists($key, $json2)) {
-                if (is_array($value)) {
-                    // Vérifie si l'élément correspondant dans json2 est aussi un tableau
-                    if (is_array($json2[$key])) {
-                        // Si c'est un tableau indexé (ex: [1,2,3])
-                        if (array_keys($value) === range(0, count($value) - 1)) {
-                            $syncedArray = [];
-                            foreach ($value as $i => $item) {
-                                $syncedArray[] = $this->syncJson($item, $json2[$key][$i] ?? []);
-                            }
-                            $result[$key] = $syncedArray;
-                        } else {
-                            // Sinon, tableau associatif
-                            $result[$key] = $this->syncJson($value, $json2[$key]);
-                        }
-                    } else {
-                        $result[$key] = $value;
-                    }
-                } else {
-                    $result[$key] = $json2[$key];
-                }
-            } else {
-                $result[$key] = $value;
-            }
-        }
-
-        return $result;
-    }
-
-
     public function __invoke(ModelSyncInput $data): JsonResponse
     {
         try {
@@ -61,7 +29,7 @@ class SyncDataController extends AbstractController {
                 $returnCode = $this->dumpSqlService->dumpSql();
                 if($returnCode == Command::SUCCESS) {
                     foreach ($models as $model) {
-                        $syncedProps = $this->syncJson($data->defaultProps, $model->getProps() ?? []);
+                        $syncedProps = ArraySynchronizer::synchronize($data->defaultProps, $model->getProps() ?? []);
                         $model->setProps($syncedProps);
                         $this->em->persist($model);
                     }
