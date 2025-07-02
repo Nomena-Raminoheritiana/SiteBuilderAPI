@@ -20,7 +20,6 @@ class GetModelByUserUuidController extends AbstractController {
         UserRepository $userRepository
     ): ?Model
     {
-        dump('df');
         try {
             $authHeader = $request->headers->get('Authorization');
             $user = $userRepository->findOneBy(['token'=> substr($authHeader, 7)]);
