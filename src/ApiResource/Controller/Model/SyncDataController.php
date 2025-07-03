@@ -29,7 +29,11 @@ class SyncDataController extends AbstractController {
                 $returnCode = $this->dumpSqlService->dumpSql();
                 if($returnCode == Command::SUCCESS) {
                     foreach ($models as $model) {
-                        $syncedProps = ArraySynchronizer::synchronize($data->defaultProps, $model->getProps() ?? []);
+                        $syncedProps = ArraySynchronizer::synchronize(
+                            $data->defaultProps,
+                            $model->getProps() ?? [],
+                            $data->forceKeys ?? []
+                        );
                         $model->setProps($syncedProps);
                         $this->em->persist($model);
                     }
