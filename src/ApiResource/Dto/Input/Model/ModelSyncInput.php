@@ -8,4 +8,6 @@ final class ModelSyncInput {
     public array $defaultProps;
     #[Groups(['Model:sync-write'])]
     public string $slug;
+    #[Groups(['Model:sync-write'])]
+    public array $forceKeys = [];
 }
