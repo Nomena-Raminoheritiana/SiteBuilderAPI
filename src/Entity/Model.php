@@ -121,6 +121,11 @@ class Model
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
+    #[ORM\ManyToOne(inversedBy: 'model',cascade: ['persist'])]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['Model:read','Model:write'])]
+    private ?GlobalSeo $globalSeo = null;
+
     public function __construct()
     {
         $this->images = new ArrayCollection();
@@ -217,6 +222,18 @@ class Model
     public function setUser(?User $user): static
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    public function getGlobalSeo(): ?GlobalSeo
+    {
+        return $this->globalSeo;
+    }
+
+    public function setGlobalSeo(?GlobalSeo $globalSeo): static
+    {
+        $this->globalSeo = $globalSeo;
 
         return $this;
     }
