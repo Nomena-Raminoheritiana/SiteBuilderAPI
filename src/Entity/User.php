@@ -60,23 +60,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $token = null;
 
-    #[Groups(['User:write', 'User:read'])]
-    #[ORM\Column(length: 255)]
-    private ?string $companyName = null;
-
-    #[Groups(['User:write', 'User:read'])]
-    #[ORM\Column(type: Types::TEXT)]
-    private ?string $businessActivity = null;
-
-    #[Groups(['User:write', 'User:read'])]
-    #[ORM\Column(length: 255)]
-    private ?string $businessLocation = null;
-
     /**
      * @var Collection<int, Model>
      */
     #[ORM\OneToMany(targetEntity: Model::class, mappedBy: 'user', orphanRemoval: true)]
     private Collection $modeles;
+
+    #[Groups(['User:write', 'User:read'])]
+    #[ORM\Column(length: 255)]
+    private ?string $fullName = null;
 
     public function __construct()
     {
@@ -166,42 +158,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getCompanyName(): ?string
-    {
-        return $this->companyName;
-    }
-
-    public function setCompanyName(string $companyName): static
-    {
-        $this->companyName = $companyName;
-
-        return $this;
-    }
-
-    public function getBusinessActivity(): ?string
-    {
-        return $this->businessActivity;
-    }
-
-    public function setBusinessActivity(string $businessActivity): static
-    {
-        $this->businessActivity = $businessActivity;
-
-        return $this;
-    }
-
-    public function getBusinessLocation(): ?string
-    {
-        return $this->businessLocation;
-    }
-
-    public function setBusinessLocation(string $businessLocation): static
-    {
-        $this->businessLocation = $businessLocation;
-
-        return $this;
-    }
-
     /**
      * @return Collection<int, Model>
      */
@@ -228,6 +184,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $modele->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getFullName(): ?string
+    {
+        return $this->fullName;
+    }
+
+    public function setFullName(string $fullName): static
+    {
+        $this->fullName = $fullName;
 
         return $this;
     }
