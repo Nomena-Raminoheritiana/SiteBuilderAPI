@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Patch;
 use App\Repository\GlobalSeoRepository;
 use App\Entity\Traits\Timestampable;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -20,6 +21,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
                 'summary' => 'Api to save  the global seo',
                 'security' => [['bearerAuth' => []]],
             ]
+        ),
+        new Patch(
+            security: "is_granted('ROLE_ADMIN')"
         )
     ],
     outputFormats: ['json' => ['application/json']],
@@ -34,7 +38,7 @@ class GlobalSeo
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['GlobalSeo:read'])]
+    #[Groups(['GlobalSeo:read', 'Model:read'])]
     private ?int $id = null;
 
     /**
@@ -45,11 +49,11 @@ class GlobalSeo
     private Collection $model;
 
     #[ORM\Column]
-    #[Groups(['GlobalSeo:read','GlobalSeo:write', 'Model:write'])]
+    #[Groups(['GlobalSeo:read','GlobalSeo:write', 'Model:write', 'Model:read'])]
     private array $formValue = [];
 
     #[ORM\Column]
-    #[Groups(['GlobalSeo:read','GlobalSeo:write', 'Model:write'])]
+    #[Groups(['GlobalSeo:read','GlobalSeo:write', 'Model:write', 'Model:read'])]
     private array $metadata = [];
 
     public function __construct()
