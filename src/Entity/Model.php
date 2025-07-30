@@ -3,12 +3,14 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\ApiResource\Controller\Model\CreateModelController;
+use App\ApiResource\Controller\Model\GetModelsByParentIdController;
 use App\ApiResource\Controller\Model\GetModelsByUserUuidController;
 use App\ApiResource\Controller\Model\SyncDataController;
 use App\ApiResource\Dto\Input\Model\ModelSyncInput;
@@ -28,6 +30,24 @@ use Symfony\Component\Serializer\Annotation\Groups;
             openapiContext: [
                 'summary' => 'Api to get a model for the current user connected',
                 // 'security' => [['bearerAuth' => []]],
+            ]
+        ),
+        new GetCollection(
+            uriTemplate: '/models/pagelist/{parentId}',
+            uriVariables: [
+                'parentId' => new Link(
+                    fromClass: null,
+                    identifiers: ['parentId'],
+                    parameterName: 'parentId'
+                )
+            ],
+            read: false,
+            controller: GetModelsByParentIdController::class,
+            normalizationContext: ['groups' => ['PageList:read']],
+            security: "is_granted('ROLE_ADMIN')",
+            openapiContext: [
+                'summary' => 'Api to get the list of the pages of a website',
+                'security' => [['bearerAuth' => []]],
             ]
         ),
         new GetCollection(
@@ -80,6 +100,10 @@ use Symfony\Component\Serializer\Annotation\Groups;
             ]
         ),
         new Patch(
+            security: "is_granted('ROLE_ADMIN')",
+            denormalizationContext: ['groups' => ['Model:write', 'Model:patch:write']]
+        ),
+        new Delete(
             security: "is_granted('ROLE_ADMIN')"
         )
     ],
@@ -92,11 +116,11 @@ class Model
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['Model:read','Model:write','Image:read'])]
+    #[Groups(['Model:read','Model:write','Image:read', 'PageList:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['Model:read','Model:write','Image:read'])]
+    #[Groups(['Model:read','Model:write','Image:read', 'PageList:read'])]
     private ?string $name = null;
 
     #[ORM\Column(nullable: true)]
@@ -104,7 +128,7 @@ class Model
     private ?array $props = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['Model:read','Model:write'])]
+    #[Groups(['Model:read','Model:write', 'PageList:read'])]
     private ?string $slug = null;
 
     /**
@@ -114,16 +138,36 @@ class Model
     private Collection $images;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['Model:read','Model:write','Image:read'])]
+    #[Groups(['Model:read','Model:write','Image:read', 'PageList:read'])]
     private ?string $themeColor = 'default';
 
     #[ORM\ManyToOne(inversedBy: 'modeles')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
+    #[ORM\Column]
+    #[Groups(['Model:read','Model:write', 'PageList:read'])]
+    private array $seo = [];
+
+    #[ORM\ManyToOne(inversedBy: 'models')]
+    #[Groups(['Model:read', 'PageList:read', 'Model:patch:write'])]
+    private ?Status $status = null;
+
+    #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'children')]
+    #[Groups(['Model:read','Model:write'])]
+    private ?self $parent = null;
+
+    /**
+     * @var Collection<int, self>
+     */
+    #[ORM\OneToMany(targetEntity: self::class, mappedBy: 'parent')]
+    #[Groups(['Model:read'])]
+    private Collection $children;
+
     public function __construct()
     {
         $this->images = new ArrayCollection();
+        $this->children = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -217,6 +261,72 @@ class Model
     public function setUser(?User $user): static
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    public function getSeo(): array
+    {
+        return $this->seo;
+    }
+
+    public function setSeo(array $seo): static
+    {
+        $this->seo = $seo;
+
+        return $this;
+    }
+
+    public function getParent(): ?self
+    {
+        return $this->parent;
+    }
+
+    public function setParent(?self $parent): static
+    {
+        $this->parent = $parent;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, self>
+     */
+    public function getChildren(): Collection
+    {
+        return $this->children;
+    }
+
+    public function addChild(self $model): static
+    {
+        if (!$this->children->contains($model)) {
+            $this->children->add($model);
+            $model->setParent($this);
+        }
+
+        return $this;
+    }
+
+    public function removeChild(self $model): static
+    {
+        if ($this->children->removeElement($model)) {
+            // set the owning side to null (unless already changed)
+            if ($model->getParent() === $this) {
+                $model->setParent(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getStatus(): ?Status
+    {
+        return $this->status;
+    }
+
+    public function setStatus(?Status $status): static
+    {
+        $this->status = $status;
 
         return $this;
     }

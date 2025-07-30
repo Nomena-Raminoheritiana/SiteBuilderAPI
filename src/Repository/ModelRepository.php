@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Model;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -24,6 +25,21 @@ class ModelRepository extends ServiceEntityRepository
             ->setParameter('slug', $slug)
             ->getQuery()
             ->getResult();
+    }
+
+    public function findByUserAndParentOrId(User $user, string|int $parentId): Array {
+        $qb = $this->createQueryBuilder('m');
+
+        $qb->where('m.user = :user')
+        ->andWhere($qb->expr()->orX(
+            'm.parent = :id',
+            'm.id = :id'
+        ))
+        ->setParameter('user', $user)
+        ->setParameter('id', (int) $parentId);
+
+        return $qb->getQuery()->getResult();
+
     }
 
     //    /**
