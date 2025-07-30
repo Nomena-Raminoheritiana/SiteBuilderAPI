@@ -163,6 +163,10 @@ class Model
     #[ORM\OneToMany(targetEntity: self::class, mappedBy: 'parent')]
     #[Groups(['Model:read'])]
     private Collection $children;
+    #[ORM\ManyToOne(inversedBy: 'model',cascade: ['persist'])]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['Model:read','Model:write'])]
+    private ?GlobalSeo $globalSeo = null;
 
     public function __construct()
     {
@@ -327,6 +331,17 @@ class Model
     public function setStatus(?Status $status): static
     {
         $this->status = $status;
+        return $this;
+    }
+
+    public function getGlobalSeo(): ?GlobalSeo
+    {
+        return $this->globalSeo;
+    }
+
+    public function setGlobalSeo(?GlobalSeo $globalSeo): static
+    {
+        $this->globalSeo = $globalSeo;
 
         return $this;
     }
