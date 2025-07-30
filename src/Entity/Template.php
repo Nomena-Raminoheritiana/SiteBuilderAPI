@@ -3,12 +3,26 @@
 namespace App\Entity;
 
 use App\Repository\TemplateRepository;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: TemplateRepository::class)]
+#[ApiResource(
+    operations: [
+        new GetCollection( 
+            security: "is_granted('ROLE_ADMIN')",
+            openapiContext: [
+                'summary' => 'Api to get the list of the available template in frontEnd',
+                'security' => [['bearerAuth' => []]],
+            ]
+        )
+    ],
+    outputFormats: ['json' => ['application/json']],
+)]
 class Template
 {
     #[ORM\Id]

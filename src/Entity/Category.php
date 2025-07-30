@@ -11,7 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CategoryRepository::class)]
 #[ApiResource(
-     operations: [
+    operations: [
         new GetCollection( 
             security: "is_granted('ROLE_ADMIN')",
             openapiContext: [
@@ -19,7 +19,8 @@ use Doctrine\ORM\Mapping as ORM;
                 'security' => [['bearerAuth' => []]],
             ]
         )
-     ]
+    ],
+    outputFormats: ['json' => ['application/json']],
 )]
 class Category
 {
