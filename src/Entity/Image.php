@@ -48,6 +48,16 @@ use Vich\UploaderBundle\Mapping\Annotation\UploadableField;
             ],
             security: "is_granted('ROLE_ADMIN')"
         ),
+        new Delete(
+            uriTemplate: "/images/template/{templateId}",
+            uriVariables: [
+                'templateId' => new Link(
+                    fromProperty: "images",
+                    fromClass: Template::class
+                )
+            ],
+            security: "is_granted('ROLE_ADMIN')"
+        ),
         new Post(
             types: ['https://schema.org/Image'],
             inputFormats: ['multipart' => ['multipart/form-data']],
@@ -60,8 +70,24 @@ use Vich\UploaderBundle\Mapping\Annotation\UploadableField;
                                 'properties' => [
                                     'file' => [
                                         'type' => 'string',
-                                        'format' => 'binary'
-                                    ]
+                                        'format' => 'binary',
+                                        'description' => 'your file'
+                                    ],
+                                    'model' => [
+                                        'type' => 'string',
+                                        'description' => 'put the model uri like /api/models/{id}',
+                                        'nullable' => true,
+                                    ],
+                                    'idFromFront' => [
+                                        'type' => 'string',
+                                        'description' => 'it is the id that you have putted in the id attribute of the image on the frontend',
+                                        'nullable' => true,
+                                    ],
+                                    'template' => [
+                                        'type' => 'string',
+                                        'description' => 'put the model uri like /api/template/{id}',
+                                        'nullable' => true,
+                                    ],
                                 ]
                             ]
                         ]
@@ -106,6 +132,9 @@ class Image
     #[Groups(['Image:read'])]
     private ?string $url = null;
 
+    #[ORM\ManyToOne(inversedBy: 'images')]
+    private ?Template $template = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -134,7 +163,7 @@ class Image
         if (null !== $file) {
             // It is required that at least one field changes if you are using doctrine
             // otherwise the event listeners won't be called and the file is lost
-            $this->updatedAt = new \DateTimeImmutable();
+            $this->updateAt = new \DateTimeImmutable();
         }
         return $this;
     }
@@ -183,6 +212,18 @@ class Image
     public function setUrl(string $url): static
     {
         $this->url = $url;
+
+        return $this;
+    }
+
+    public function getTemplate(): ?Template
+    {
+        return $this->template;
+    }
+
+    public function setTemplate(?Template $template): static
+    {
+        $this->template = $template;
 
         return $this;
     }

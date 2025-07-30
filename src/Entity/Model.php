@@ -164,7 +164,7 @@ class Model
     #[Groups(['Model:read'])]
     private Collection $children;
     #[ORM\ManyToOne(inversedBy: 'model',cascade: ['persist'])]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     #[Groups(['Model:read','Model:write'])]
     private ?GlobalSeo $globalSeo = null;
 
