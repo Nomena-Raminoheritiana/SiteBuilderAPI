@@ -136,9 +136,9 @@ class Image
     #[Groups(['Image:read'])]
     private ?string $url = null;
 
-    #[ORM\ManyToOne(inversedBy: 'images')]
+    #[ORM\OneToOne(mappedBy: 'image', cascade: ['persist', 'remove'])]
     private ?Template $template = null;
-
+    
     public function getId(): ?int
     {
         return $this->id;
@@ -227,6 +227,16 @@ class Image
 
     public function setTemplate(?Template $template): static
     {
+        // unset the owning side of the relation if necessary
+        if ($template === null && $this->template !== null) {
+            $this->template->setImage(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($template !== null && $template->getImage() !== $this) {
+            $template->setImage($this);
+        }
+
         $this->template = $template;
 
         return $this;

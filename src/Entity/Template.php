@@ -54,17 +54,10 @@ class Template
     #[Groups(['Template:read'])]
     private ?Category $category = null;
 
-    /**
-     * @var Collection<int, Image>
-     */
-    #[ORM\OneToMany(targetEntity: Image::class, mappedBy: 'template')]
+    #[ORM\OneToOne(inversedBy: 'template', cascade: ['persist', 'remove'])]
     #[Groups(['Template:read'])]
-    private Collection $images;
+    private ?Image $image = null;
 
-    public function __construct()
-    {
-        $this->images = new ArrayCollection();
-    }
 
     public function getId(): ?int
     {
@@ -119,36 +112,6 @@ class Template
         return $this;
     }
 
-    /**
-     * @return Collection<int, Image>
-     */
-    public function getImages(): Collection
-    {
-        return $this->images;
-    }
-
-    public function addImage(Image $image): static
-    {
-        if (!$this->images->contains($image)) {
-            $this->images->add($image);
-            $image->setTemplate($this);
-        }
-
-        return $this;
-    }
-
-    public function removeImage(Image $image): static
-    {
-        if ($this->images->removeElement($image)) {
-            // set the owning side to null (unless already changed)
-            if ($image->getTemplate() === $this) {
-                $image->setTemplate(null);
-            }
-        }
-
-        return $this;
-    }
-
     public function getProps(): ?array
     {
         return $this->props;
@@ -157,6 +120,18 @@ class Template
     public function setProps(?array $props): static
     {
         $this->props = $props;
+
+        return $this;
+    }
+
+    public function getImage(): ?Image
+    {
+        return $this->image;
+    }
+
+    public function setImage(?Image $image): static
+    {
+        $this->image = $image;
 
         return $this;
     }
