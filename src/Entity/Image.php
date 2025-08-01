@@ -85,7 +85,7 @@ use Vich\UploaderBundle\Mapping\Annotation\UploadableField;
                                     ],
                                     'template' => [
                                         'type' => 'string',
-                                        'description' => 'put the model uri like /api/template/{id}',
+                                        'description' => 'put the template uri like /api/templates/{id}',
                                         'nullable' => true,
                                     ],
                                 ]
@@ -94,6 +94,10 @@ use Vich\UploaderBundle\Mapping\Annotation\UploadableField;
                     ])
                 )
             ),
+            openapiContext: [
+                'summary' => 'Api to add the template or model image',
+                'security' => [['bearerAuth' => []]],
+            ],
             security: "is_granted('ROLE_ADMIN')",
         )
     ],
@@ -105,7 +109,7 @@ class Image
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['Image:read', 'Image:write'])]
+    #[Groups(['Image:read', 'Image:write', 'Template:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -116,7 +120,7 @@ class Image
    #[UploadableField(mapping: 'image', fileNameProperty: 'name')]
     private ?File $file = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['Image:read'])]
     private ?string $idFromFront = null;
 
