@@ -29,11 +29,11 @@ class Category
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['Template:read', 'category:read'])]
+    #[Groups(['Template:read', 'category:read', 'Model:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['Template:read', 'category:read'])]
+    #[Groups(['Template:read', 'category:read', 'Model:read'])]
     private ?string $label = null;
 
     #[ORM\Column(length: 255, nullable: true)]

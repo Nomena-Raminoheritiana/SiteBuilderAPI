@@ -191,6 +191,7 @@ class Model
      * @var Collection<int, Image>
      */
     #[ORM\OneToMany(targetEntity: Image::class, mappedBy: 'model')]
+    #[Groups(['Model:read'])]
     private Collection $images;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -219,6 +220,7 @@ class Model
     #[ORM\OneToMany(targetEntity: self::class, mappedBy: 'parent')]
     #[Groups(['Model:read','Model:compact:read'])]
     private Collection $children;
+
     #[ORM\ManyToOne(inversedBy: 'model',cascade: ['persist'])]
     #[ORM\JoinColumn(nullable: true)]
     #[Groups(['Model:read','Model:write', 'Model:compact:read'])]
