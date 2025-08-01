@@ -22,8 +22,10 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Cocur\Slugify\Slugify;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: ModelRepository::class)]
+#[UniqueEntity('url', message: 'URL already exist')]
 #[ORM\HasLifecycleCallbacks]
 #[ApiResource(
     operations: [
@@ -222,12 +224,16 @@ class Model
     #[Groups(['Model:read','Model:write', 'Model:compact:read'])]
     private ?GlobalSeo $globalSeo = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 255, nullable: true, unique: true)]
     #[Groups(['Model:read', 'Model:write', 'PageList:read', 'Model:patch:write', 'Model:compact:read'])]
     private ?string $url = null;
 
     #[ORM\Column(nullable: true)]
     private ?array $propsPublished = null;
+
+    #[ORM\ManyToOne(inversedBy: 'models')]
+    #[Groups(['Model:read', 'Model:write', 'PageList:read', 'Model:patch:write', 'Model:compact:read'])]
+    private ?Category $category = null;
 
     public function __construct()
     {
@@ -442,6 +448,18 @@ class Model
     public function setPropsPublished(?array $propsPublished): static
     {
         $this->propsPublished = $propsPublished;
+
+        return $this;
+    }
+
+    public function getCategory(): ?Category
+    {
+        return $this->category;
+    }
+
+    public function setCategory(?Category $category): static
+    {
+        $this->category = $category;
 
         return $this;
     }
