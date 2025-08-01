@@ -12,6 +12,8 @@ use ApiPlatform\Metadata\Post;
 use App\ApiResource\Controller\Model\CreateModelController;
 use App\ApiResource\Controller\Model\GetModelsByParentIdController;
 use App\ApiResource\Controller\Model\GetModelsByUserUuidController;
+use App\ApiResource\Controller\Model\MovePropsToPublishedAndCacheController;
+use App\ApiResource\Controller\Model\RestorePropsFromCacheController;
 use App\ApiResource\Controller\Model\SyncDataController;
 use App\ApiResource\Dto\Input\Model\ModelSyncInput;
 use App\Repository\ModelRepository;
@@ -19,10 +21,30 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Cocur\Slugify\Slugify;
 
 #[ORM\Entity(repositoryClass: ModelRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 #[ApiResource(
     operations: [
+        new Get(
+            uriTemplate: '/models/compact_Data/{id}',
+            uriVariables: [
+                'id' => new Link(
+                    fromClass: null,
+                    identifiers: ['id'],
+                    parameterName: 'id'
+                )
+            ],
+            normalizationContext: ['groups' => ['Model:compact:read']],
+            // security: "is_granted('ROLE_ADMIN')",
+            // read: false,
+            // controller: GetModelByUserUuidController::class,
+            openapiContext: [
+                'summary' => 'Api to get a model with only the compact data',
+                // 'security' => [['bearerAuth' => []]],
+            ]
+        ),
         new Get(
             // security: "is_granted('ROLE_ADMIN')",
             // read: false,
@@ -99,6 +121,38 @@ use Symfony\Component\Serializer\Annotation\Groups;
                 'security' => [['bearerAuth' => []]],
             ]
         ),
+        new Post(
+            uriTemplate: '/models/{id}/publish-props',
+            uriVariables: [
+                'id' => 'id'
+            ],
+            controller: MovePropsToPublishedAndCacheController::class,
+            name: 'publish_props_to_cache',
+            read: false,
+            write: false,
+            input: false,
+            security: "is_granted('ROLE_ADMIN')",
+            openapiContext: [
+                'summary' => 'Publishes props to propsPublished and caches them',
+                'security' => [['bearerAuth' => []]],
+            ],
+        ), 
+        new Post(
+            uriTemplate: '/models/{id}/restore-props',
+            uriVariables: [
+                'id' => 'id'
+            ],
+            controller: RestorePropsFromCacheController::class,
+            name: 'restore_props_from_cache',
+            read: false,
+            write: false,
+            input: false,
+            security: "is_granted('ROLE_ADMIN')",
+            openapiContext: [
+                'summary' => 'Restaure les props depuis le cache dans props',
+                'security' => [['bearerAuth' => []]],
+            ]
+        ),
         new Patch(
             security: "is_granted('ROLE_ADMIN')",
             denormalizationContext: ['groups' => ['Model:write', 'Model:patch:write']]
@@ -116,11 +170,11 @@ class Model
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['Model:read','Model:write','Image:read', 'PageList:read'])]
+    #[Groups(['Model:read','Model:write','Image:read', 'PageList:read', 'Model:compact:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['Model:read','Model:write','Image:read', 'PageList:read'])]
+    #[Groups(['Model:read','Model:write','Image:read', 'PageList:read', 'Model:compact:read'])]
     private ?string $name = null;
 
     #[ORM\Column(nullable: true)]
@@ -128,7 +182,7 @@ class Model
     private ?array $props = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['Model:read','Model:write', 'PageList:read'])]
+    #[Groups(['Model:read', 'PageList:read', 'Model:compact:read'])]
     private ?string $slug = null;
 
     /**
@@ -138,7 +192,7 @@ class Model
     private Collection $images;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['Model:read','Model:write','Image:read', 'PageList:read'])]
+    #[Groups(['Model:read','Model:write','Image:read', 'PageList:read', 'Model:compact:read'])]
     private ?string $themeColor = 'default';
 
     #[ORM\ManyToOne(inversedBy: 'modeles')]
@@ -146,27 +200,34 @@ class Model
     private ?User $user = null;
 
     #[ORM\Column]
-    #[Groups(['Model:read','Model:write', 'PageList:read'])]
+    #[Groups(['Model:read','Model:write', 'PageList:read','Model:compact:read'])]
     private array $seo = [];
 
     #[ORM\ManyToOne(inversedBy: 'models')]
-    #[Groups(['Model:read', 'PageList:read', 'Model:patch:write'])]
+    #[Groups(['Model:read', 'PageList:read', 'Model:patch:write', 'Model:compact:read'])]
     private ?Status $status = null;
 
     #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'children')]
-    #[Groups(['Model:read','Model:write'])]
+    #[Groups(['Model:read','Model:write','Model:compact:read'])]
     private ?self $parent = null;
 
     /**
      * @var Collection<int, self>
      */
     #[ORM\OneToMany(targetEntity: self::class, mappedBy: 'parent')]
-    #[Groups(['Model:read'])]
+    #[Groups(['Model:read','Model:compact:read'])]
     private Collection $children;
     #[ORM\ManyToOne(inversedBy: 'model',cascade: ['persist'])]
     #[ORM\JoinColumn(nullable: true)]
-    #[Groups(['Model:read','Model:write'])]
+    #[Groups(['Model:read','Model:write', 'Model:compact:read'])]
     private ?GlobalSeo $globalSeo = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['Model:read', 'Model:write', 'PageList:read', 'Model:patch:write', 'Model:compact:read'])]
+    private ?string $url = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?array $propsPublished = null;
 
     public function __construct()
     {
@@ -206,6 +267,16 @@ class Model
     public function getSlug(): ?string
     {
         return $this->slug;
+    }
+
+    #[ORM\PrePersist]
+    #[ORM\PreUpdate]
+    public function updateSlug(): void
+    {
+        if ($this->name) {
+            $slugify = new Slugify();
+            $this->slug = $slugify->slugify($this->name);
+        }
     }
 
     public function setSlug(string $slug): static
@@ -342,6 +413,35 @@ class Model
     public function setGlobalSeo(?GlobalSeo $globalSeo): static
     {
         $this->globalSeo = $globalSeo;
+
+        return $this;
+    }
+
+    public function updateGlobalSeo():static
+    {
+        return $this;
+    }
+
+    public function getUrl(): ?string
+    {
+        return $this->url;
+    }
+
+    public function setUrl(?string $url): static
+    {
+        $this->url = $url;
+
+        return $this;
+    }
+
+    public function getPropsPublished(): ?array
+    {
+        return $this->propsPublished;
+    }
+
+    public function setPropsPublished(?array $propsPublished): static
+    {
+        $this->propsPublished = $propsPublished;
 
         return $this;
     }
