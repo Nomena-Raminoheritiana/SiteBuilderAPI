@@ -29,15 +29,15 @@ class Category
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['Template:read', 'category:read', 'Model:read'])]
+    #[Groups(['Template:read', 'category:read', 'Model:read', 'PageList:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['Template:read', 'category:read', 'Model:read'])]
+    #[Groups(['Template:read', 'category:read', 'Model:read', 'PageList:read'])]
     private ?string $label = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['category:read'])]
+    #[Groups(['category:read', 'PageList:read'])]
     private ?string $code = null;
 
     /**

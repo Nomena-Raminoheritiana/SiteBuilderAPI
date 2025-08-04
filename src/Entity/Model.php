@@ -19,6 +19,7 @@ use App\ApiResource\Dto\Input\Model\ModelSyncInput;
 use App\Repository\ModelRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Cocur\Slugify\Slugify;
@@ -236,6 +237,10 @@ class Model
     #[ORM\ManyToOne(inversedBy: 'models')]
     #[Groups(['Model:read', 'Model:write', 'PageList:read', 'Model:patch:write', 'Model:compact:read'])]
     private ?Category $category = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['PageList:read', 'Model:write', 'Model:patch:write'])]
+    private ?string $description = null;
 
     public function __construct()
     {
@@ -462,6 +467,18 @@ class Model
     public function setCategory(?Category $category): static
     {
         $this->category = $category;
+
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): static
+    {
+        $this->description = $description;
 
         return $this;
     }
