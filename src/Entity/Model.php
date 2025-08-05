@@ -12,6 +12,7 @@ use ApiPlatform\Metadata\Post;
 use App\ApiResource\Controller\Model\CreateModelController;
 use App\ApiResource\Controller\Model\GetModelsByParentIdController;
 use App\ApiResource\Controller\Model\GetModelsByUserUuidController;
+use App\ApiResource\Controller\Model\GetModelByUserUuidController;
 use App\ApiResource\Controller\Model\MovePropsToPublishedAndCacheController;
 use App\ApiResource\Controller\Model\RestorePropsFromCacheController;
 use App\ApiResource\Controller\Model\SyncDataController;
@@ -50,8 +51,8 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
         ),
         new Get(
             // security: "is_granted('ROLE_ADMIN')",
-            // read: false,
-            // controller: GetModelByUserUuidController::class,
+            read: false,
+            controller: GetModelByUserUuidController::class,
             openapiContext: [
                 'summary' => 'Api to get a model for the current user connected',
                 // 'security' => [['bearerAuth' => []]],

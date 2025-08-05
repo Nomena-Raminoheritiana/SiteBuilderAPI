@@ -26,7 +26,13 @@ class GetModelByUserUuidController extends AbstractController {
             if (!$user) {
                 throw new NotFoundHttpException('User not found.');
             }
-            return $modelRepository->findOneBy(['user' => $user, 'id'=> (int) $id]);
+            $model = $modelRepository->findOneBy(['user' => $user, 'id'=> (int) $id]);
+
+            if(!$model) {
+                throw new NotFoundHttpException('Model not found.');
+            }
+
+            return $model;
         } catch (\InvalidArgumentException $e) {
             throw new BadRequestHttpException('UUID not valid.');
         }

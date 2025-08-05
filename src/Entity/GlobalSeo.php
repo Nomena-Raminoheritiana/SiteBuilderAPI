@@ -5,6 +5,8 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Patch;
+use App\ApiResource\Controller\GlobalSeo\UpdateGlobalSeoController;
+use App\ApiResource\Dto\Input\GlobalSeo\GlobalSeoUpdateInput;
 use App\Repository\GlobalSeoRepository;
 use App\Entity\Traits\Timestampable;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -23,7 +25,16 @@ use Symfony\Component\Serializer\Annotation\Groups;
             ]
         ),
         new Patch(
-            security: "is_granted('ROLE_ADMIN')"
+            controller: UpdateGlobalSeoController::class,
+            input: GlobalSeoUpdateInput::class,
+            output: GlobalSeo::class,
+            security: "is_granted('ROLE_ADMIN')",
+            read: false,
+            write: false,
+            openapiContext: [
+                'summary' => 'Api to update  the global seo and the model (name, seo) associated',
+                'security' => [['bearerAuth' => []]],
+            ]
         )
     ],
     outputFormats: ['json' => ['application/json']],
