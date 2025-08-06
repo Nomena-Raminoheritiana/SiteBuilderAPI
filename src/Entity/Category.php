@@ -14,10 +14,10 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ApiResource(
     operations: [
         new GetCollection( 
-            security: "is_granted('ROLE_ADMIN')",
+            //security: "is_granted('ROLE_ADMIN')",
             openapiContext: [
                 'summary' => 'Api to get the list of the template/model category',
-                'security' => [['bearerAuth' => []]],
+                //'security' => [['bearerAuth' => []]],
             ],
             normalizationContext: ['groups' => ['category:read']],
         )
