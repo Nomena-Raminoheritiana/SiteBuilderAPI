@@ -44,6 +44,7 @@ class ModelCompactNormalizer implements NormalizerInterface
         
         return [
             'id' => $object->getId(),
+            'url' => $object->getUrl(),
             'status' => $status,
             'children' => $children,
         ];
