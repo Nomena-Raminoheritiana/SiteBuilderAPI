@@ -24,10 +24,10 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Cocur\Slugify\Slugify;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use App\Validator\Constraints as AppAssert;
 
+#[AppAssert\UniqueUrlPerParent]
 #[ORM\Entity(repositoryClass: ModelRepository::class)]
-#[UniqueEntity('url', message: 'URL already exist')]
 #[ORM\HasLifecycleCallbacks]
 #[ApiResource(
     operations: [
@@ -228,7 +228,7 @@ class Model
     #[Groups(['Model:read','Model:write', 'Model:compact:read'])]
     private ?GlobalSeo $globalSeo = null;
 
-    #[ORM\Column(length: 255, nullable: true, unique: true)]
+    #[ORM\Column(length: 255, nullable: true, unique: false)]
     #[Groups(['Model:read', 'Model:write', 'PageList:read', 'Model:patch:write', 'Model:compact:read'])]
     private ?string $url = null;
 
