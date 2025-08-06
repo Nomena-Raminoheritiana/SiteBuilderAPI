@@ -37,3 +37,9 @@ services:
         arguments: ['@App\ApiResource\OpenApi\OpenApiFactory.inner']
         autoconfigure: false
         autowire: true
+
+    App\ApiResource\Normalizer\Model\ModelCompactNormalizer:
+        arguments:
+            $normalizer: '@serializer.normalizer.object'
+        tags:
+            - { name: 'serializer.normalizer', priority: 100 }
