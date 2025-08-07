@@ -49,7 +49,7 @@ class GlobalSeo
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['GlobalSeo:read', 'Model:read'])]
+    #[Groups(['GlobalSeo:read', 'Model:read', 'Model:compact:read'])]
     private ?int $id = null;
 
     /**
@@ -64,7 +64,7 @@ class GlobalSeo
     private array $formValue = [];
 
     #[ORM\Column]
-    #[Groups(['GlobalSeo:read','GlobalSeo:write', 'Model:write', 'Model:read'])]
+    #[Groups(['GlobalSeo:read','GlobalSeo:write', 'Model:write', 'Model:read', 'Model:compact:read'])]
     private array $metadata = [];
 
     public function __construct()
