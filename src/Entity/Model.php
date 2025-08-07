@@ -233,6 +233,7 @@ class Model
     private ?string $url = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['Model:read'])]
     private ?array $propsPublished = null;
 
     #[ORM\ManyToOne(inversedBy: 'models')]

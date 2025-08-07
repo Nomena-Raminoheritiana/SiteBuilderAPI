@@ -36,6 +36,7 @@ class ModelCompactNormalizer implements NormalizerInterface
     if (isset($context[self::ALREADY_CALLED])) {
          // Normaliser status et children avec le bon groupe
         $status = $object->getStatus() ? $this->normalizer->normalize($object->getStatus(), $format, $context) : null;
+        $globalSeo = $object->getGlobalSeo() ? $this->normalizer->normalize($object->getGlobalSeo(), $format, $context) : null;
         
         $children = [];
         foreach ($object->getChildren() as $child) {
@@ -44,9 +45,12 @@ class ModelCompactNormalizer implements NormalizerInterface
         
         return [
             'id' => $object->getId(),
+            'name' => $object->getName(),
             'url' => $object->getUrl(),
             'status' => $status,
             'children' => $children,
+            'seo' => $object->getSeo(),
+            'globalSeo' => $globalSeo
         ];
     }
 
