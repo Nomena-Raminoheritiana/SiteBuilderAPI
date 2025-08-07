@@ -16,7 +16,10 @@ use App\ApiResource\Controller\Model\GetModelByUserUuidController;
 use App\ApiResource\Controller\Model\MovePropsToPublishedAndCacheController;
 use App\ApiResource\Controller\Model\RestorePropsFromCacheController;
 use App\ApiResource\Controller\Model\SyncDataController;
+use App\ApiResource\Controller\Model\UrlResolverController;
 use App\ApiResource\Dto\Input\Model\ModelSyncInput;
+use App\ApiResource\Dto\Input\Model\UrlResolverInput;
+use App\ApiResource\OpenApi\ModelOpenApiSchema;
 use App\Repository\ModelRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -103,6 +106,15 @@ use App\Validator\Constraints as AppAssert;
                 'summary' => 'Api to get the list of the models of the user connected',
                 'security' => [['bearerAuth' => []]],
             ]
+        ),
+        new Post(
+            uriTemplate: '/models/resolve-url',
+            controller: UrlResolverController::class,
+            input: UrlResolverInput::class,
+            read: false,
+            name: 'models_resolve_url',
+            denormalizationContext: ['groups' => ['resolve_url:write']],
+            openapiContext: ModelOpenApiSchema::URL_RESOLVER,
         ),
         new Post(
             security: "is_granted('ROLE_ADMIN')",
