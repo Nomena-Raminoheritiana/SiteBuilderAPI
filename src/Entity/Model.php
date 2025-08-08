@@ -253,7 +253,7 @@ class Model
     private ?Category $category = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(['PageList:read', 'Model:write', 'Model:patch:write'])]
+    #[Groups(['PageList:read', 'Model:read', 'Model:write', 'Model:patch:write'])]
     private ?string $description = null;
 
     public function __construct()
