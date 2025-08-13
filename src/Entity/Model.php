@@ -189,7 +189,7 @@ use App\Validator\Constraints as AppAssert;
             security: "is_granted('ROLE_ADMIN')",
             denormalizationContext: ['groups' => ['Model:write', 'Model:patch:write']],
             openapiContext: [
-                'summary' => 'Restaure les props depuis le cache dans props',
+                'summary' => 'Partially updates only the property specified in the payload',
                 'security' => [['bearerAuth' => []]],
             ]
         ),
