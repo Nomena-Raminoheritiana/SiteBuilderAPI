@@ -17,8 +17,10 @@ use App\ApiResource\Controller\Model\MovePropsToPublishedAndCacheController;
 use App\ApiResource\Controller\Model\RestorePropsFromCacheController;
 use App\ApiResource\Controller\Model\SyncDataController;
 use App\ApiResource\Controller\Model\UrlResolverController;
+use App\ApiResource\Controller\Model\CheckDomainController;
 use App\ApiResource\Dto\Input\Model\ModelSyncInput;
 use App\ApiResource\Dto\Input\Model\UrlResolverInput;
+use App\ApiResource\Dto\Input\Model\CheckDomainInput;
 use App\ApiResource\OpenApi\ModelOpenApiSchema;
 use App\Repository\ModelRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -169,9 +171,27 @@ use App\Validator\Constraints as AppAssert;
                 'security' => [['bearerAuth' => []]],
             ]
         ),
+        new Post(
+            uriTemplate: '/models/check-domain',
+            controller: CheckDomainController::class,
+            input: CheckDomainInput::class,
+            read: false,
+            write: false,
+            name: 'check_model_domain',
+            denormalizationContext: ['groups' => ['CheckDomain:write']],
+            security: "is_granted('ROLE_ADMIN')",
+            openapiContext: [
+                'summary' => 'Verify if the domain is already used by another model',
+                'security' => [['bearerAuth' => []]],
+            ],
+        ),
         new Patch(
             security: "is_granted('ROLE_ADMIN')",
-            denormalizationContext: ['groups' => ['Model:write', 'Model:patch:write']]
+            denormalizationContext: ['groups' => ['Model:write', 'Model:patch:write']],
+            openapiContext: [
+                'summary' => 'Partially updates only the property specified in the payload',
+                'security' => [['bearerAuth' => []]],
+            ]
         ),
         new Delete(
             security: "is_granted('ROLE_ADMIN')"
@@ -255,6 +275,10 @@ class Model
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[Groups(['PageList:read', 'Model:read', 'Model:write', 'Model:patch:write'])]
     private ?string $description = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['PageList:read', 'Model:read', 'Model:write', 'Model:patch:write', 'Model:compact:read'])]
+    private ?string $domain = null;
 
     public function __construct()
     {
@@ -493,6 +517,18 @@ class Model
     public function setDescription(?string $description): static
     {
         $this->description = $description;
+
+        return $this;
+    }
+
+    public function getDomain(): ?string
+    {
+        return $this->domain;
+    }
+
+    public function setDomain(?string $domain): static
+    {
+        $this->domain = $domain;
 
         return $this;
     }
