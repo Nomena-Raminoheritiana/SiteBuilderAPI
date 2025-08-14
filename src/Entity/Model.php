@@ -316,7 +316,7 @@ class Model
     private ?string $domain = null;
 
     #[ORM\OneToOne(targetEntity: Image::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
-    #[Groups(['Model:patch:write'])]
+    #[Groups(['Model:read', 'Model:patch:write'])]
     private ?Image $logo = null;
 
     public function __construct()
