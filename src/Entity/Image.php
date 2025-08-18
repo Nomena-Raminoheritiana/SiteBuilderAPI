@@ -113,7 +113,7 @@ class Image
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['Image:read'])]
+    #[Groups(['Image:read', 'Model:read'])]
     #[ApiProperty(writable: false)]
     private ?string $name = null;
 
