@@ -9,6 +9,8 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\OpenApi\Model\Operation;
+use ApiPlatform\OpenApi\Model\RequestBody;
 use App\ApiResource\Controller\Model\CreateModelController;
 use App\ApiResource\Controller\Model\GetModelsByParentIdController;
 use App\ApiResource\Controller\Model\GetModelsByUserUuidController;
@@ -18,6 +20,7 @@ use App\ApiResource\Controller\Model\RestorePropsFromCacheController;
 use App\ApiResource\Controller\Model\SyncDataController;
 use App\ApiResource\Controller\Model\UrlResolverController;
 use App\ApiResource\Controller\Model\CheckDomainController;
+use App\ApiResource\Controller\Model\UpsertModelLogoController;
 use App\ApiResource\Dto\Input\Model\ModelSyncInput;
 use App\ApiResource\Dto\Input\Model\UrlResolverInput;
 use App\ApiResource\Dto\Input\Model\CheckDomainInput;
@@ -185,6 +188,38 @@ use App\Validator\Constraints as AppAssert;
                 'security' => [['bearerAuth' => []]],
             ],
         ),
+        new Post(
+            uriTemplate: '/models/{id}/logo',
+            controller: UpsertModelLogoController::class,
+            inputFormats: ['multipart' => ['multipart/form-data']],
+            deserialize: false,
+            openapi: new Operation(
+                requestBody: new RequestBody(
+                    content: new \ArrayObject([
+                        'multipart/form-data' => [
+                            'schema' => [
+                                'type' => 'object',
+                                'properties' => [
+                                    'file' => [
+                                        'type' => 'string',
+                                        'format' => 'binary',
+                                        'description' => 'Logo image file',
+                                    ],
+                                ],
+                                'required' => ['file']
+                            ]
+                        ]
+                    ])
+                )
+            ),
+            read: true, // injects the Model entity as argument
+            name: 'post_model_logo',
+            security: "is_granted('ROLE_ADMIN')",
+            openapiContext: [
+                'summary' => 'Upload a logo for associated model',
+                'security' => [['bearerAuth' => []]],
+            ],
+        ),
         new Patch(
             security: "is_granted('ROLE_ADMIN')",
             denormalizationContext: ['groups' => ['Model:write', 'Model:patch:write']],
@@ -279,6 +314,10 @@ class Model
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['PageList:read', 'Model:read', 'Model:write', 'Model:patch:write', 'Model:compact:read'])]
     private ?string $domain = null;
+
+    #[ORM\OneToOne(targetEntity: Image::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[Groups(['Model:read', 'Model:patch:write', 'Model:compact:read'])]
+    private ?Image $logo = null;
 
     public function __construct()
     {
@@ -529,6 +568,18 @@ class Model
     public function setDomain(?string $domain): static
     {
         $this->domain = $domain;
+
+        return $this;
+    }
+
+    public function getLogo(): ?Image
+    {
+        return $this->logo;
+    }
+
+    public function setLogo(?Image $logo): static
+    {
+        $this->logo = $logo;
 
         return $this;
     }

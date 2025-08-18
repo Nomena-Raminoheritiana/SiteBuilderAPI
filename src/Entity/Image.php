@@ -109,11 +109,11 @@ class Image
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['Image:read', 'Image:write', 'Template:read', 'Model:read'])]
+    #[Groups(['Image:read', 'Image:write', 'Template:read', 'Model:read', 'Model:compact:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['Image:read'])]
+    #[Groups(['Image:read', 'Model:read'])]
     #[ApiProperty(writable: false)]
     private ?string $name = null;
 

@@ -50,6 +50,7 @@ class ModelCompactNormalizer implements NormalizerInterface
             'status' => $status,
             'domain' => $object->getDomain(),
             'children' => $children,
+            'logo' => $object->getLogo(),
             'seo' => $object->getSeo(),
             'globalSeo' => $globalSeo
         ];
