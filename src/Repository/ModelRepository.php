@@ -42,6 +42,21 @@ class ModelRepository extends ServiceEntityRepository
 
     }
 
+    public function findChildrenOrOrphans(?Model $parent = null): array
+    {
+        $qb = $this->createQueryBuilder('m');
+
+        if ($parent) {
+            // Récupère les enfants du modèle
+            $qb->where('m.parent = :parent')
+               ->setParameter('parent', $parent);
+        } else {
+            // Récupère les modèles sans parent
+            $qb->where('m.parent IS NULL');
+        }
+
+        return $qb->getQuery()->getResult();
+    }
     //    /**
     //     * @return Page[] Returns an array of Page objects
     //     */
