@@ -574,7 +574,15 @@ class Model
 
     public function getLogo(): ?Image
     {
-        return $this->logo;
+        if ($this->logo) {
+            return $this->logo;
+        }
+
+        if ($this->parent && $this->parent !== $this) {
+            return $this->parent->getLogo();
+        }
+
+        return null;
     }
 
     public function setLogo(?Image $logo): static
