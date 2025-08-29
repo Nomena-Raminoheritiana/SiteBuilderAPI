@@ -22,7 +22,7 @@ class GetModelByUserUuidController extends AbstractController {
     {
         try {
             $authHeader = $request->headers->get('Authorization');
-            $user = $userRepository->findOneBy(['token'=> substr($authHeader, 7)]);
+            $user = $userRepository->findOneBy(['token'=> $authHeader]);
             if (!$user) {
                 throw new NotFoundHttpException('User not found.');
             }
