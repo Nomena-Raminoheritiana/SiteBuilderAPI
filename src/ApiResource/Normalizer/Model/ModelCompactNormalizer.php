@@ -51,6 +51,7 @@ class ModelCompactNormalizer implements NormalizerInterface
             'domain' => $object->getDomain(),
             'children' => $children,
             'logo' => $object->getLogo(),
+            'themeColor' => $object->getThemeColor(),
             'seo' => $object->getSeo(),
             'globalSeo' => $globalSeo
         ];
