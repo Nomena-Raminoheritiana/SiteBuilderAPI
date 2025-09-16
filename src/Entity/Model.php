@@ -20,11 +20,13 @@ use App\ApiResource\Controller\Model\RestorePropsFromCacheController;
 use App\ApiResource\Controller\Model\SyncDataController;
 use App\ApiResource\Controller\Model\UrlResolverController;
 use App\ApiResource\Controller\Model\CheckDomainController;
+use App\ApiResource\Controller\Model\GetChatBotConfigByModelIdController;
 use App\ApiResource\Controller\Model\UpsertModelLogoController;
 use App\ApiResource\Dto\Input\Model\ModelSyncInput;
 use App\ApiResource\Dto\Input\Model\UrlResolverInput;
 use App\ApiResource\Dto\Input\Model\CheckDomainInput;
 use App\ApiResource\OpenApi\ModelOpenApiSchema;
+use App\ApiResource\Processor\ModelPatchProcessor;
 use App\Repository\ModelRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -39,6 +41,24 @@ use App\Validator\Constraints as AppAssert;
 #[ORM\HasLifecycleCallbacks]
 #[ApiResource(
     operations: [
+        new Get(
+            // security: "is_granted('ROLE_ADMIN')",
+            uriTemplate: '/models/{id}/chat_bot_config',
+            uriVariables: [
+                'id' => new Link(
+                    fromClass: null,
+                    identifiers: ['id'],
+                    parameterName: 'id'
+                )
+            ],
+            read: false,
+            controller: GetChatBotConfigByModelIdController::class,
+            normalizationContext: ['groups' => ['Model:chatbotConfig:read']],
+            openapiContext: [
+                'summary' => 'Api to get the chatbot Configuration of the model id given in the parameter',
+                // 'security' => [['bearerAuth' => []]],
+            ]
+        ),
         new Get(
             uriTemplate: '/models/compact_Data/{id}',
             uriVariables: [
@@ -221,6 +241,7 @@ use App\Validator\Constraints as AppAssert;
             ],
         ),
         new Patch(
+            processor: ModelPatchProcessor::class,
             security: "is_granted('ROLE_ADMIN')",
             denormalizationContext: ['groups' => ['Model:write', 'Model:patch:write']],
             openapiContext: [
@@ -318,6 +339,10 @@ class Model
     #[ORM\OneToOne(targetEntity: Image::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
     #[Groups(['Model:read', 'Model:patch:write', 'Model:compact:read'])]
     private ?Image $logo = null;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['Model:chatbotConfig:read', 'Model:patch:write'])]
+    private ?array $chatBotConfig = null;
 
     public function __construct()
     {
@@ -588,6 +613,18 @@ class Model
     public function setLogo(?Image $logo): static
     {
         $this->logo = $logo;
+
+        return $this;
+    }
+
+    public function getChatBotConfig(): ?array
+    {
+        return $this->chatBotConfig;
+    }
+
+    public function setChatBotConfig(?array $chatBotConfig): static
+    {
+        $this->chatBotConfig = $chatBotConfig;
 
         return $this;
     }
