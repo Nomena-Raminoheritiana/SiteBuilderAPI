@@ -12,7 +12,9 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class ModelRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(
+        ManagerRegistry $registry
+    )
     {
         parent::__construct($registry, Model::class);
     }
@@ -57,6 +59,28 @@ class ModelRepository extends ServiceEntityRepository
 
         return $qb->getQuery()->getResult();
     }
+
+    public function findOneByChatId(string $chatId): ?Model
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = 'SELECT * FROM model 
+                WHERE JSON_UNQUOTE(JSON_EXTRACT(chat_bot_config, "$.id")) = :chatId 
+                LIMIT 1';
+
+        $result = $conn->executeQuery($sql, ['chatId' => $chatId])->fetchAssociative();
+
+        if (!$result) {
+            return null;
+        }
+
+        return $this->getEntityManager()->getRepository(Model::class)->find($result['id']);
+    }
+
+
+
+
+
     //    /**
     //     * @return Page[] Returns an array of Page objects
     //     */

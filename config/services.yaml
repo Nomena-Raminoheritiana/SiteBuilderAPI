@@ -6,6 +6,7 @@
 parameters:
     jwt.default.secretKey: '%env(JWT_DEFAULT_SECRET_KEY)%'
     mysql.dump.path: '%env(MYSQL_DUMP_PATH)%'
+    google_gen_ai_key: '%env(GOOGLE_GEN_AI_KEY)%'
 
 services:
     # default configuration for services in *this* file
@@ -43,3 +44,10 @@ services:
             $normalizer: '@serializer.normalizer.object'
         tags:
             - { name: 'serializer.normalizer', priority: 100 }
+
+    App\Services\ChatBot\GeminiClient:
+        arguments:
+            $apiKey: '%google_gen_ai_key%'
+    App\Services\ChatBot\PromptBuilder:
+        arguments:
+            $templatePath: '%kernel.project_dir%/prompts/CommonAISubject.txt'
