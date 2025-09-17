@@ -79,6 +79,10 @@ class Template
     #[ORM\OneToMany(targetEntity: self::class, mappedBy: 'parent')]
     private Collection $children;
 
+    #[ORM\Column(length: 255, nullable: true, unique: false)]
+    #[Groups(['Template:read'])]
+    private ?string $url = null;
+
     public function __construct()
     {
         $this->children = new ArrayCollection();
@@ -200,6 +204,18 @@ class Template
                 $child->setParent(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getUrl(): ?string
+    {
+        return $this->url;
+    }
+
+    public function setUrl(?string $url): static
+    {
+        $this->url = $url;
 
         return $this;
     }

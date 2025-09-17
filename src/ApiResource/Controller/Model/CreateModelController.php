@@ -4,6 +4,7 @@ namespace App\ApiResource\Controller\Model;
 use ApiPlatform\Validator\Exception\ValidationException;
 use App\Entity\Model;
 use App\Repository\StatusRepository;
+use App\Repository\TemplateRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -12,6 +13,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class CreateModelController extends AbstractController {
     public function __construct(
         private StatusRepository $statusRepository,
+        private TemplateRepository $templateRepository,
         private EntityManagerInterface $em,
         private Security $security,
         private ValidatorInterface $validator, 
@@ -24,6 +26,32 @@ class CreateModelController extends AbstractController {
 
         if ($user === null) {
             throw new \RuntimeException('No authenticated user found');
+        }
+
+        if($model->getTemplateId()) {
+            $template = $this->templateRepository->find($model->getTemplateId());
+
+            if (!$template) {
+                throw new \RuntimeException('Template not found.');
+            }
+
+            foreach ($template->getChildren() as $childTemplate) {
+                $childModel = new Model();
+                $childModel->setUser($user);
+                $childModel->setParent($model);
+
+                $childModel->setName($childTemplate->getName());
+                $childModel->setProps($childTemplate->getProps());
+                $childModel->setCategory($childTemplate->getCategory());
+                $childModel->setUrl($childTemplate->getUrl());
+                $childModel->setSeo($model->getSeo());
+                $childModel->setStatus($status);
+
+                $this->em->persist($childModel);
+            }
+
+            $model->setProps($template->getProps());
+            $model->setUrl($template->getUrl());
         }
 
         // Lier le modèle à l'utilisateur connecté
