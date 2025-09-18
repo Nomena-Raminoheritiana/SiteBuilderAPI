@@ -5,10 +5,12 @@ namespace App\Entity;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Doctrine\Orm\Filter\ExistsFilter;
 use ApiPlatform\Metadata\ApiFilter;
+use App\ApiResource\Controller\Template\GetTemplatesByParentIdController;
 use App\Repository\TemplateRepository;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Link;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -22,6 +24,22 @@ use Symfony\Component\Serializer\Annotation\Groups;
         new GetCollection(
             openapiContext: [
                 'summary' => 'Api to get the list of the available template in frontEnd',
+            ]
+        ),
+        new GetCollection(
+            uriTemplate: '/templates/templateList/{parentId}',
+            uriVariables: [
+                'parentId' => new Link(
+                    fromClass: null,
+                    identifiers: ['parentId'],
+                    parameterName: 'parentId'
+                )
+            ],
+            read: false,
+            controller: GetTemplatesByParentIdController::class,
+            normalizationContext: ['groups' => ['TemplateList:read']],
+            openapiContext: [
+                'summary' => 'Api to get the list of the templates related of the main template',
             ]
         )
     ],
@@ -42,7 +60,7 @@ class Template
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['Template:read'])]
+    #[Groups(['Template:read', 'TemplateList:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -77,10 +95,11 @@ class Template
      * @var Collection<int, self>
      */
     #[ORM\OneToMany(targetEntity: self::class, mappedBy: 'parent')]
+    #[Groups(['Template:read'])]
     private Collection $children;
 
     #[ORM\Column(length: 255, nullable: true, unique: false)]
-    #[Groups(['Template:read'])]
+    #[Groups(['Template:read', 'TemplateList:read'])]
     private ?string $url = null;
 
     public function __construct()

@@ -25,7 +25,6 @@ use App\ApiResource\Controller\Model\UpsertModelLogoController;
 use App\ApiResource\Dto\Input\Model\ModelSyncInput;
 use App\ApiResource\Dto\Input\Model\UrlResolverInput;
 use App\ApiResource\Dto\Input\Model\CheckDomainInput;
-use App\ApiResource\Dto\Input\Model\CreateModelFromTemplateInput;
 use App\ApiResource\OpenApi\ModelOpenApiSchema;
 use App\ApiResource\Processor\ModelPatchProcessor;
 use App\Repository\ModelRepository;
