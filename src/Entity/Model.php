@@ -344,6 +344,9 @@ class Model
     #[Groups(['Model:chatbotConfig:read', 'Model:patch:write'])]
     private ?array $chatBotConfig = null;
 
+    #[Groups(['Model:write'])]
+    private ?int $templateId = null;
+
     public function __construct()
     {
         $this->images = new ArrayCollection();
@@ -626,6 +629,17 @@ class Model
     {
         $this->chatBotConfig = $chatBotConfig;
 
+        return $this;
+    }
+
+    public function getTemplateId(): ?int
+    {
+        return $this->templateId;
+    }
+
+    public function setTemplateId(?int $templateId): static
+    {
+        $this->templateId = $templateId;
         return $this;
     }
 }

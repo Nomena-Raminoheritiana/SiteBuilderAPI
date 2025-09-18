@@ -3,11 +3,16 @@
 namespace App\Entity;
 
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Doctrine\Orm\Filter\ExistsFilter;
 use ApiPlatform\Metadata\ApiFilter;
+use App\ApiResource\Controller\Template\GetTemplatesByParentIdController;
 use App\Repository\TemplateRepository;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Link;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -20,20 +25,42 @@ use Symfony\Component\Serializer\Annotation\Groups;
             openapiContext: [
                 'summary' => 'Api to get the list of the available template in frontEnd',
             ]
+        ),
+        new GetCollection(
+            uriTemplate: '/templates/templateList/{parentId}',
+            uriVariables: [
+                'parentId' => new Link(
+                    fromClass: null,
+                    identifiers: ['parentId'],
+                    parameterName: 'parentId'
+                )
+            ],
+            read: false,
+            controller: GetTemplatesByParentIdController::class,
+            normalizationContext: ['groups' => ['TemplateList:read']],
+            openapiContext: [
+                'summary' => 'Api to get the list of the templates related of the main template',
+            ]
         )
     ],
     outputFormats: ['json' => ['application/json']],
     normalizationContext: ['groups' => ['Template:read']],
     denormalizationContext: ['groups' => ['Template:write']]
 )]
-#[ApiFilter(SearchFilter::class, properties: ['category' => 'exact'])]
-#[ApiFilter(SearchFilter::class, properties: ['category.id' => 'exact'])]
+#[ApiFilter(SearchFilter::class, properties: [
+    'category' => 'exact',
+    'category.id' => 'exact',
+    'parent.id' => 'exact'
+])]
+#[ApiFilter(ExistsFilter::class, properties: [
+    'parent'
+])]
 class Template
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['Template:read'])]
+    #[Groups(['Template:read', 'TemplateList:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -59,6 +86,26 @@ class Template
     #[ORM\OneToOne(inversedBy: 'template', cascade: ['persist', 'remove'])]
     #[Groups(['Template:read'])]
     private ?Image $image = null;
+
+    #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'children')]
+    #[Groups(['Template:read'])]
+    private ?self $parent = null;
+
+    /**
+     * @var Collection<int, self>
+     */
+    #[ORM\OneToMany(targetEntity: self::class, mappedBy: 'parent')]
+    #[Groups(['Template:read'])]
+    private Collection $children;
+
+    #[ORM\Column(length: 255, nullable: true, unique: false)]
+    #[Groups(['Template:read', 'TemplateList:read'])]
+    private ?string $url = null;
+
+    public function __construct()
+    {
+        $this->children = new ArrayCollection();
+    }
 
 
     public function getId(): ?int
@@ -134,6 +181,60 @@ class Template
     public function setImage(?Image $image): static
     {
         $this->image = $image;
+
+        return $this;
+    }
+
+    public function getParent(): ?self
+    {
+        return $this->parent;
+    }
+
+    public function setParent(?self $parent): static
+    {
+        $this->parent = $parent;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, self>
+     */
+    public function getChildren(): Collection
+    {
+        return $this->children;
+    }
+
+    public function addChild(self $child): static
+    {
+        if (!$this->children->contains($child)) {
+            $this->children->add($child);
+            $child->setParent($this);
+        }
+
+        return $this;
+    }
+
+    public function removeChild(self $child): static
+    {
+        if ($this->children->removeElement($child)) {
+            // set the owning side to null (unless already changed)
+            if ($child->getParent() === $this) {
+                $child->setParent(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getUrl(): ?string
+    {
+        return $this->url;
+    }
+
+    public function setUrl(?string $url): static
+    {
+        $this->url = $url;
 
         return $this;
     }
