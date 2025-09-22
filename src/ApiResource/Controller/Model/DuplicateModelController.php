@@ -26,6 +26,7 @@ class DuplicateModelController extends AbstractController
         $newModel = clone $currentModel;
         $uuid = Uuid::uuid4()->toString();
         $newModel->setUrl('/'.$uuid);
+        $newModel->setUpdatedAt(new \DateTimeImmutable());
 
         $em->persist($newModel);
         $em->flush();
