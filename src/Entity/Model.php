@@ -361,8 +361,9 @@ class Model
     #[Groups(['Model:chatbotConfig:read', 'Model:patch:write'])]
     private ?array $chatBotConfig = null;
 
-    #[Groups(['Model:write'])]
-    private ?int $templateId = null;
+    #[ORM\ManyToOne(inversedBy: 'models')]
+     #[Groups(['Model:write'])]
+    private ?Template $template = null;
 
     public function __construct()
     {
@@ -649,14 +650,15 @@ class Model
         return $this;
     }
 
-    public function getTemplateId(): ?int
+    public function getTemplate(): ?Template
     {
-        return $this->templateId;
+        return $this->template;
     }
 
-    public function setTemplateId(?int $templateId): static
+    public function setTemplate(?Template $template): static
     {
-        $this->templateId = $templateId;
+        $this->template = $template;
+
         return $this;
     }
 }

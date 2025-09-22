@@ -28,8 +28,8 @@ class CreateModelController extends AbstractController {
             throw new \RuntimeException('No authenticated user found');
         }
 
-        if($model->getTemplateId()) {
-            $template = $this->templateRepository->find($model->getTemplateId());
+        if($model->getTemplate()) {
+            $template = $model->getTemplate();
 
             if (!$template) {
                 throw new \RuntimeException('Template not found.');
@@ -46,12 +46,13 @@ class CreateModelController extends AbstractController {
                 $childModel->setUrl($childTemplate->getUrl());
                 $childModel->setSeo($model->getSeo());
                 $childModel->setStatus($status);
+                $childModel->setTemplate($childTemplate);
 
                 $this->em->persist($childModel);
             }
 
             $model->setProps($template->getProps());
-            $model->setUrl($template->getUrl());
+            $model->setUrl($model->getUrl() ?? $template->getUrl());
         }
 
         // Lier le modèle à l'utilisateur connecté

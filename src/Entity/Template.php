@@ -102,9 +102,16 @@ class Template
     #[Groups(['Template:read', 'TemplateList:read'])]
     private ?string $url = null;
 
+    /**
+     * @var Collection<int, Model>
+     */
+    #[ORM\OneToMany(targetEntity: Model::class, mappedBy: 'template')]
+    private Collection $models;
+
     public function __construct()
     {
         $this->children = new ArrayCollection();
+        $this->models = new ArrayCollection();
     }
 
 
@@ -235,6 +242,36 @@ class Template
     public function setUrl(?string $url): static
     {
         $this->url = $url;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Model>
+     */
+    public function getModels(): Collection
+    {
+        return $this->models;
+    }
+
+    public function addModel(Model $model): static
+    {
+        if (!$this->models->contains($model)) {
+            $this->models->add($model);
+            $model->setTemplate($this);
+        }
+
+        return $this;
+    }
+
+    public function removeModel(Model $model): static
+    {
+        if ($this->models->removeElement($model)) {
+            // set the owning side to null (unless already changed)
+            if ($model->getTemplate() === $this) {
+                $model->setTemplate(null);
+            }
+        }
 
         return $this;
     }
