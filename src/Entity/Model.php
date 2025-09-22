@@ -20,13 +20,16 @@ use App\ApiResource\Controller\Model\RestorePropsFromCacheController;
 use App\ApiResource\Controller\Model\SyncDataController;
 use App\ApiResource\Controller\Model\UrlResolverController;
 use App\ApiResource\Controller\Model\CheckDomainController;
+use App\ApiResource\Controller\Model\DuplicateModelController;
 use App\ApiResource\Controller\Model\GetChatBotConfigByModelIdController;
 use App\ApiResource\Controller\Model\UpsertModelLogoController;
 use App\ApiResource\Dto\Input\Model\ModelSyncInput;
 use App\ApiResource\Dto\Input\Model\UrlResolverInput;
 use App\ApiResource\Dto\Input\Model\CheckDomainInput;
+use App\ApiResource\Dto\Input\Model\DuplicationInput;
 use App\ApiResource\OpenApi\ModelOpenApiSchema;
 use App\ApiResource\Processor\ModelPatchProcessor;
+use App\Entity\Traits\Timestampable;
 use App\Repository\ModelRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -129,6 +132,18 @@ use App\Validator\Constraints as AppAssert;
             security: "is_granted('ROLE_ADMIN')",
             openapiContext: [
                 'summary' => 'Api to get the list of the models of the user connected',
+                'security' => [['bearerAuth' => []]],
+            ]
+        ),
+        new Post(
+            uriTemplate: '/models/duplicate',
+            controller: DuplicateModelController::class,
+            input: DuplicationInput::class,
+            read: false,
+            name: 'models_duplicate_url',
+            denormalizationContext: ['groups' => ['duplicate:write']],
+            openapiContext: [
+                'summary' => 'Api to duplicate a model of the user connected',
                 'security' => [['bearerAuth' => []]],
             ]
         ),
@@ -259,6 +274,8 @@ use App\Validator\Constraints as AppAssert;
 )]
 class Model
 {
+    use Timestampable;
+    
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]

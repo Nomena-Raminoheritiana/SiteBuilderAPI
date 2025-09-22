@@ -6,6 +6,7 @@ namespace App\Entity\Traits;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\DBAL\Types\Types;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
  * Timestampable Trait, utilisable sur version PHP >= 5.4
@@ -30,6 +31,7 @@ trait Timestampable
      */
     #[Gedmo\Timestampable(on: 'update')]
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(['Model:read','Model:write', 'PageList:read', 'Model:compact:read'])]
     protected $updatedAt;
 
     /**
